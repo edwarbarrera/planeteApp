@@ -1,0 +1,224 @@
+<html>
+<head>
+<title>PlaneteEditActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+PlaneteEditActivity.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.planeteapp</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">androidx.annotation.Nullable</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.graphics.Bitmap</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.graphics.BitmapFactory</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.graphics.Color</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.net.Uri</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.ParcelFileDescriptor</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.util.Base64</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.util.Log</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Button</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.EditText</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.ImageView</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.example.planeteapp.model.Planete</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.example.planeteapp.services.PlaneteService</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.io.ByteArrayOutputStream</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.FileDescriptor</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.FileNotFoundException</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">retrofit2.Call</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">retrofit2.Callback</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">retrofit2.Response</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">PlaneteEditActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity {</span>
+    <span class="s0">private </span><span class="s1">Planete planete</span><span class="s0">;</span>
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_planete_create)</span><span class="s0">;</span>
+
+        <span class="s1">Intent intent= getIntent()</span><span class="s0">;</span>
+
+        <span class="s0">final long </span><span class="s1">id= intent.getLongExtra(</span><span class="s2">&quot;id&quot;</span><span class="s0">, </span><span class="s3">0</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">PlaneteApplication applicationContext=(PlaneteApplication)getApplicationContext()</span><span class="s0">;</span>
+        <span class="s1">PlaneteService service=  applicationContext.getService()</span><span class="s0">;</span>
+        <span class="s1">Call&lt;Planete&gt; planeteById =service.getPlaneteById(id)</span><span class="s0">;</span>
+        <span class="s1">planeteById.enqueue(</span><span class="s0">new </span><span class="s1">Callback&lt;Planete&gt;() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onResponse(Call&lt;Planete&gt; call</span><span class="s0">, </span><span class="s1">Response&lt;Planete&gt; response) {</span>
+                <span class="s0">if </span><span class="s1">(response.isSuccessful()){</span>
+                    <span class="s1">planete=response.body()</span><span class="s0">;</span>
+                    <span class="s1">EditText etNom=(EditText)findViewById(R.id.planete_name)</span><span class="s0">;</span>
+                    <span class="s1">EditText etDistance=(EditText)findViewById(R.id.planete_distance)</span><span class="s0">;</span>
+                    <span class="s1">ImageView ivImage=(ImageView )findViewById(R.id.planete_image)</span><span class="s0">;</span>
+                    <span class="s1">etNom.setText(planete.getNom())</span><span class="s0">;</span>
+                    <span class="s1">etDistance.setText(planete.getDistance()+ </span><span class="s2">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">if</span><span class="s1">(planete.getImageBase64()!=</span><span class="s0">null</span><span class="s1">) {</span>
+                        <span class="s0">byte</span><span class="s1">[]decode= Base64.decode(planete.getImageBase64()</span><span class="s0">, </span><span class="s1">android.util.Base64.DEFAULT)</span><span class="s0">;</span>
+                        <span class="s1">Bitmap bitmap= BitmapFactory.decodeByteArray(decode</span><span class="s0">, </span><span class="s3">0</span><span class="s0">, </span><span class="s1">decode.length)</span><span class="s0">;</span>
+                        <span class="s1">ivImage.setImageBitmap(bitmap)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onFailure(Call&lt;Planete&gt; call</span><span class="s0">, </span><span class="s1">Throwable t) {</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+
+
+     <span class="s4">/* String nom= intent.getStringExtra(&quot;nom&quot;); 
+      int distance=intent.getIntExtra(&quot;distance&quot;,0); 
+      String imageBase64= intent.getStringExtra(&quot;imageBase64&quot;); 
+      planete =new Planete (nom, distance,imageBase64); 
+      planete.setId(id); 
+      EditText etNom=(EditText)findViewById(R.id.planete_name); 
+      EditText etDistance=(EditText)findViewById(R.id.planete_distance); 
+      ImageView ivImage=(ImageView )findViewById(R.id.planete_image); 
+ 
+        etNom.setText(nom); 
+        etDistance.setText(distance+ &quot;&quot;); 
+       if(imageBase64!=null) { 
+           byte[]decode= Base64.decode(planete.getImageBase64(), android.util.Base64.DEFAULT); 
+        Bitmap bitmap= BitmapFactory.decodeByteArray(decode, 0, decode.length); 
+        ivImage.setImageBitmap(bitmap); 
+       }*/</span>
+
+        <span class="s1">Button submitbutton=(Button) findViewById(R.id.planete_create_submit_btn)</span><span class="s0">;</span>
+        <span class="s1">submitbutton.setText(</span><span class="s2">&quot;modifier planete&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s4">//        submit btn</span>
+        <span class="s1">submitbutton.setOnClickListener((view)-&gt;{</span>
+            <span class="s0">final </span><span class="s1">EditText etNom=  (EditText)findViewById(R.id.planete_name)</span><span class="s0">;</span><span class="s4">//on recupere le nom du champs de text</span>
+
+            <span class="s0">final </span><span class="s1">EditText etDistance= (EditText)findViewById(R.id.planete_distance)</span><span class="s0">;</span><span class="s4">// on reucpere la distance</span>
+            <span class="s1">String nomPlanete=etNom.getText().toString()</span><span class="s0">;</span>
+            <span class="s1">String tempDistance=etDistance.getText().toString()</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">distance= tempDistance.isEmpty() ?</span><span class="s3">0 </span><span class="s1">: Integer.parseInt(etDistance.getText().toString())</span><span class="s0">;</span>
+<span class="s4">// validation des donnees</span>
+            <span class="s0">boolean </span><span class="s1">error=</span><span class="s0">false;</span>
+
+            <span class="s1">nomPlanete=nomPlanete.trim()</span><span class="s0">;</span>
+
+            <span class="s0">if</span><span class="s1">(nomPlanete.isEmpty()){</span>
+                <span class="s1">etNom.setBackgroundColor(Color.RED)</span><span class="s0">;</span>
+                <span class="s1">etNom.setTextColor(Color.WHITE)</span><span class="s0">;</span>
+                <span class="s1">error=</span><span class="s0">true;</span>
+            <span class="s1">}</span>
+            <span class="s4">//validation à faire en utilisant RegEx</span>
+            <span class="s0">if</span><span class="s1">(distance &lt; </span><span class="s3">0</span><span class="s1">){</span>
+                <span class="s1">etDistance.setBackgroundColor(Color.RED)</span><span class="s0">;</span>
+                <span class="s1">etDistance.setTextColor(Color.WHITE)</span><span class="s0">;</span>
+                <span class="s1">error=</span><span class="s0">true;</span>
+            <span class="s1">}</span>
+            <span class="s0">if </span><span class="s1">(error) </span><span class="s0">return;</span>
+
+            <span class="s1">planete.setNom(nomPlanete)</span><span class="s0">;</span>
+            <span class="s1">planete.setDistance(distance)</span><span class="s0">;</span>
+
+            <span class="s4">// envoyer la requete vers le serveur /planetes</span>
+            <span class="s4">// creer l objet retrofit</span>
+           <span class="s4">/* Retrofit retrofit = new Retrofit.Builder()// connection a la bdd  remplacé par le singleton dans planeteAppliaction 
+                    .baseUrl(&quot;https://cbc540afb436.ngrok.io/&quot;) 
+                    .addConverterFactory(GsonConverterFactory.create()) 
+                    .build(); 
+ 
+            PlaneteService service=retrofit.create(PlaneteService.class);*/</span>
+
+          <span class="s4">/*  PlaneteApplication applicationContext=(PlaneteApplication)getApplicationContext();// recuperetion du context PlaneteApplication 
+            PlaneteService service=applicationContext.getService();// initialisation de la variable*/</span>
+
+            <span class="s1">Call&lt;Planete&gt;call= service.editPlanete(planete.getId()</span><span class="s0">,</span><span class="s1">planete)</span><span class="s0">;</span>
+            <span class="s1">call.enqueue(</span><span class="s0">new </span><span class="s1">Callback&lt;Planete&gt;() {</span>
+                <span class="s1">@Override</span>
+                <span class="s0">public void </span><span class="s1">onResponse(Call&lt;Planete&gt; call</span><span class="s0">, </span><span class="s1">Response&lt;Planete&gt; response) {</span>
+                    <span class="s0">if</span><span class="s1">(response.isSuccessful()){</span>
+                        <span class="s1">Planete planete= response.body()</span><span class="s0">;</span><span class="s4">// remplie les values  (?,?,?,?,?,?) dans la table de la bdd</span>
+
+                        <span class="s1">Intent intent=getIntent()</span><span class="s0">;</span>
+                        <span class="s1">intent.putExtra(</span><span class="s2">&quot;planeteId&quot;</span><span class="s0">, </span><span class="s1">planete.getId())</span><span class="s0">;</span>
+                        <span class="s1">setResult(RESULT_OK</span><span class="s0">, </span><span class="s1">intent)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+
+                <span class="s1">}</span>
+
+                <span class="s1">@Override</span>
+                <span class="s0">public void </span><span class="s1">onFailure(Call&lt;Planete&gt; call</span><span class="s0">, </span><span class="s1">Throwable t) {</span>
+                    <span class="s1">Log.i(</span><span class="s2">&quot;planteCeditActivity&quot;</span><span class="s0">,</span><span class="s1">t.toString())</span><span class="s0">;</span>
+
+                <span class="s1">}</span>
+            <span class="s1">})</span><span class="s0">;</span>
+
+
+            <span class="s4">// on recupere l objet intent pour envoyer la repo,se vres la main activity</span>
+
+
+           <span class="s4">/* Intent intent=getIntent(); 
+             intent.putExtra(&quot;nomPlanete&quot;, nomPlanete); 
+             intent.putExtra(&quot;distancePLanete&quot;,distance); 
+             //envoye la reponse via le code result ok ET L OBJET INTENT 
+             setResult(RESULT_OK,intent); 
+             finish();*/</span>
+
+        <span class="s1">})</span><span class="s0">;</span>
+        <span class="s0">final </span><span class="s1">View upLoadbtn= findViewById(R.id.planete_upload_btn)</span><span class="s0">;</span>
+        <span class="s1">upLoadbtn.setOnClickListener((view)-&gt;{</span>
+            <span class="s1">Intent i=</span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_GET_CONTENT)</span><span class="s0">;</span>
+            <span class="s1">i.setType(</span><span class="s2">&quot;image/*&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">Intent fileChooser= Intent.createChooser(i</span><span class="s0">, </span><span class="s2">&quot;selectionner une image&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s4">// on cree une fenetre pour pouvoir selectionner une fichier</span>
+            <span class="s1">startActivityForResult(fileChooser</span><span class="s0">,</span><span class="s3">1</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">})</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+    <span class="s0">protected void </span><span class="s1">onActivityResult(</span><span class="s0">int </span><span class="s1">requestCode</span><span class="s0">, int </span><span class="s1">resultCode</span><span class="s0">, </span><span class="s1">@Nullable Intent data) {</span>
+        <span class="s0">super</span><span class="s1">.onActivityResult(requestCode</span><span class="s0">, </span><span class="s1">resultCode</span><span class="s0">, </span><span class="s1">data)</span><span class="s0">;</span>
+
+        <span class="s0">if</span><span class="s1">(requestCode==</span><span class="s3">1 </span><span class="s1">&amp;&amp; resultCode==RESULT_OK &amp;&amp; </span><span class="s0">null</span><span class="s1">!=data){</span><span class="s4">// l user a bien choisi une image</span>
+
+            <span class="s1">Uri uri =data.getData()</span><span class="s0">;</span>
+
+            <span class="s0">try </span><span class="s1">{</span>
+                <span class="s1">ParcelFileDescriptor r=  getContentResolver().openFileDescriptor(uri</span><span class="s0">,</span><span class="s2">&quot;r&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s4">// r POUR READ w POUR WRITTABLE</span>
+
+                <span class="s1">FileDescriptor fileDescriptor=r.getFileDescriptor()</span><span class="s0">;</span>
+                <span class="s1">Bitmap bitmap= BitmapFactory.decodeFileDescriptor(fileDescriptor)</span><span class="s0">;</span>
+                <span class="s1">ImageView ivImage =(ImageView)findViewById(R.id.planete_image)</span><span class="s0">;</span>
+                <span class="s1">ivImage.setImageBitmap(bitmap)</span><span class="s0">;</span>
+
+                <span class="s4">//convertir  bitmap en un byteArray</span>
+                <span class="s1">ByteArrayOutputStream baos=</span><span class="s0">new </span><span class="s1">ByteArrayOutputStream()</span><span class="s0">;</span>
+                <span class="s1">bitmap.compress(Bitmap.CompressFormat.PNG</span><span class="s0">, </span><span class="s3">100</span><span class="s0">, </span><span class="s1">baos)</span><span class="s0">;</span><span class="s4">// on convert avec une constate png on garde 100 % de qualite</span>
+                <span class="s0">byte</span><span class="s1">[] bytes=baos.toByteArray()</span><span class="s0">;</span>
+                <span class="s4">//convertir un tableau de bytes en un string base64</span>
+                <span class="s1">String imageBase64=Base64.encodeToString(bytes</span><span class="s0">, </span><span class="s1">Base64.DEFAULT)</span><span class="s0">;</span>
+                <span class="s1">planete.setImageBase64(imageBase64)</span><span class="s0">;</span>
+                
+            <span class="s1">} </span><span class="s0">catch </span><span class="s1">(FileNotFoundException e) {</span>
+                <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+
+
+
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>

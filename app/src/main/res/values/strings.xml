@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PlaneteApp</string>
+    <string name="listPlanetes">listPlanetes</string>
+    <string name="listDistances">listDistances</string>
+    <string name="menu_create_planete_label">Créer planete</string>
+    <string name="menu_edit_planete_label">Modifier</string>
+    <string name="menu_delete_planete_label">Supprimer</string>
+    <string name="planete_create_form_label">Créer une planète</string>
+    <string name="menu_creer_planete_label" />
+    <string name="planete_upload_btn">strings.xml</string>
+    <string name="planete_upload_btn_label">planete_upload</string>
+
+
+</resources>
